@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 import PersonType from './types'
 import ControlledInputField from './components/ControlledInputField'
 import AddNewPersonForm from './components/AddNewPersonForm'
 import PersonList from './components/PersonList'
+import personService from './services/persons'
 
 const App = (): React.JSX.Element => {
-    const [persons, setPersons] = useState([
-        { name: 'Arto Hellas', number: '040-123456' },
-        { name: 'Ada Lovelace', number: '39-44-5323523' },
-        { name: 'Dan Abramov', number: '12-43-234345' },
-        { name: 'Mary Poppendieck', number: '39-23-6423122' }
-    ])
+    const [persons, setPersons] = useState<PersonType[]>([])
     const [personsFiltered, setPersonsFiltered] = useState<PersonType[]>(persons)
     const [nameField, setNameField] = useState('')
     const [numberField, setNumberField] = useState('')
     const [searchField, setSearchField] = useState('')
-
 
     const handleNameFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNameField(event.target.value)
@@ -32,11 +28,23 @@ const App = (): React.JSX.Element => {
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
         if (!persons.some(person => person.name === nameField)) {
-            setPersons(persons.concat({ name: nameField, number: numberField }))
+            console.log('adding person')
+            personService.create({ name: nameField, number: numberField })
+                .then(createdPerson =>
+                    setPersons(persons.concat(createdPerson))
+                )
         } else {
             alert(`The phonebook already has a person named ${nameField}.`)
         }
     }
+
+    useEffect(() => {
+        console.log("fetching persons")
+        personService.getAll()
+            .then(response => {
+                setPersons(response)
+            })
+    }, [])
 
     useEffect(() => {
         setPersonsFiltered(persons.filter(person =>
