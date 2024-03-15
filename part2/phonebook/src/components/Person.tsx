@@ -1,11 +1,17 @@
 import React from "react"
-import PersonType from "../types"
+import { PersonType } from "../types"
 
-const Person = (props: PersonType): React.JSX.Element => {
+interface PersonProps {
+    person: PersonType
+    handleDeleteButtonClick: (id: string) => void
+}
+
+const Person = (props: PersonProps): React.JSX.Element => {
     return (
-        <>
-            <p>{props.name} {props.number}</p>
-        </>
+        <p>
+            {props.person.name} {props.person.number}{' '}
+            <button onClick={() => props.handleDeleteButtonClick(props.person.id)}>delete</button>
+        </p>
     )
 }
 

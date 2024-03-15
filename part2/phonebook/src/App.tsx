@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import PersonType from './types'
+import { PersonType, PersonNoId } from './types'
 import ControlledInputField from './components/ControlledInputField'
 import AddNewPersonForm from './components/AddNewPersonForm'
 import PersonList from './components/PersonList'
@@ -25,17 +24,35 @@ const App = (): React.JSX.Element => {
         setSearchField(event.target.value)
     }
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSubmitButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
         if (!persons.some(person => person.name === nameField)) {
             console.log('adding person')
-            personService.create({ name: nameField, number: numberField })
+            const newPerson: PersonNoId = { name: nameField, number: numberField }
+            personService.create(newPerson)
                 .then(createdPerson =>
                     setPersons(persons.concat(createdPerson))
                 )
         } else {
             alert(`The phonebook already has a person named ${nameField}.`)
         }
+    }
+
+    const deletePerson = (id: string) => {
+        console.log('deleting person')
+        const personToDelete = persons.find(person => person.id === id)
+        if (personToDelete === undefined) {
+            window.alert(`Person id ${id} not found.`)
+            return
+        }
+        if (!window.confirm(`Delete ${personToDelete.name}?`)) {
+            return
+        }
+        personService.remove(id).then(response =>
+            setPersons(persons.filter(person =>
+                person.id !== response.id)
+            )
+        )
     }
 
     useEffect(() => {
@@ -57,9 +74,9 @@ const App = (): React.JSX.Element => {
             <h2>Phonebook</h2>
             <ControlledInputField fieldName='search' fieldOnChange={handleSearchFieldChange} />
             <h2>add a new</h2>
-            <AddNewPersonForm handleNameFieldChange={handleNameFieldChange} handleNumberFieldChange={handleNumberFieldChange} handleSubmitButtonClick={handleClick} />
+            <AddNewPersonForm handleNameFieldChange={handleNameFieldChange} handleNumberFieldChange={handleNumberFieldChange} handleSubmitButtonClick={handleSubmitButtonClick} />
             <h2>Numbers</h2>
-            <PersonList persons={personsFiltered} />
+            <PersonList persons={personsFiltered} handleDeleteButtonClick={deletePerson} />
         </div>
     )
 }

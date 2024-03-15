@@ -1,15 +1,22 @@
-import PersonType from "../types"
+import { PersonType } from "../types"
 import Person from "./Person"
 
 interface PersonListProps {
     persons: PersonType[]
+    handleDeleteButtonClick: (id: string) => void
 }
 
-const PersonList = ({ persons }: PersonListProps): React.JSX.Element => {
+const PersonList = (props: PersonListProps): React.JSX.Element => {
     return (
-        <div>
-            {persons.map(person => <Person key={person.name} name={person.name} number={person.number} />)}
-        </div>
+        <>
+            {props.persons.map(person =>
+                <Person
+                    key={person.id}
+                    person={{ id: person.id, name: person.name, number: person.number }}
+                    handleDeleteButtonClick={props.handleDeleteButtonClick}
+                />
+            )}
+        </>
     )
 }
 export default PersonList
