@@ -12,29 +12,35 @@ const App = (): React.JSX.Element => {
     const [numberField, setNumberField] = useState('')
     const [searchField, setSearchField] = useState('')
 
-    const handleNameFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNameFieldChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setNameField(event.target.value)
     }
 
-    const handleNumberFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNumberFieldChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setNumberField(event.target.value)
     }
 
-    const handleSearchFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchFieldChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setSearchField(event.target.value)
     }
 
-    const handleSubmitButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSubmitButtonClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
         event.preventDefault()
-        if (!persons.some(person => person.name === nameField)) {
+        const personIfExists: PersonType | undefined = persons.find(person => person.name === nameField)
+        if (personIfExists === undefined) {
             console.log('adding person')
             const newPerson: PersonNoId = { name: nameField, number: numberField }
             personService.create(newPerson)
                 .then(createdPerson =>
                     setPersons(persons.concat(createdPerson))
                 )
-        } else {
-            alert(`The phonebook already has a person named ${nameField}.`)
+        } else if (window.confirm(`The phonebook already has a person named ${nameField}. Replace the number?`)) {
+            console.log('replacing person')
+            const updatedPerson: PersonType = { ...personIfExists, number: numberField }
+            personService.update(updatedPerson)
+                .then(response => {
+                    setPersons(replacePerson(persons, response, updatedPerson))
+                })
         }
     }
 
@@ -79,6 +85,16 @@ const App = (): React.JSX.Element => {
             <PersonList persons={personsFiltered} handleDeleteButtonClick={deletePerson} />
         </div>
     )
+}
+
+const replacePerson = (persons: PersonType[], personToReplace: PersonType, updatedPerson: PersonType): PersonType[] => {
+    return persons.map(person => {
+        if (person.id === personToReplace.id) {
+            return updatedPerson
+        } else {
+            return person
+        }
+    })
 }
 
 export default App

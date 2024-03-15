@@ -18,8 +18,14 @@ const remove = (id: string): Promise<PersonType> => {
     return request.then(response => response.data)
 }
 
+const update = (newPerson: PersonType): Promise<PersonType> => {
+    const request = axios.put(`${baseUrl}/${newPerson.id}`, newPerson)
+    return request.then(response => response.data)
+}
+
 export default {
     getAll,
     create,
     remove,
+    update,
 }
