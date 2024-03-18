@@ -4,6 +4,7 @@ import ControlledInputField from './components/ControlledInputField'
 import AddNewPersonForm from './components/AddNewPersonForm'
 import PersonList from './components/PersonList'
 import personService from './services/persons'
+import NotificationText from './components/Notification/NotificationText'
 
 const App = (): React.JSX.Element => {
     const [persons, setPersons] = useState<PersonType[]>([])
@@ -11,6 +12,9 @@ const App = (): React.JSX.Element => {
     const [nameField, setNameField] = useState('')
     const [numberField, setNumberField] = useState('')
     const [searchField, setSearchField] = useState('')
+    const [notificationText, setNotificationText] = useState('')
+    const [notificationColor, setNotificationColor] = useState('white')
+    const [notificationTimerID, setNotificationTimerID] = useState(0)
 
     const handleNameFieldChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setNameField(event.target.value)
@@ -31,15 +35,20 @@ const App = (): React.JSX.Element => {
             console.log('adding person')
             const newPerson: PersonNoId = { name: nameField, number: numberField }
             personService.create(newPerson)
-                .then(createdPerson =>
+                .then(createdPerson => {
                     setPersons(persons.concat(createdPerson))
-                )
+                    notify('Person added', true)
+                })
         } else if (window.confirm(`The phonebook already has a person named ${nameField}. Replace the number?`)) {
             console.log('replacing person')
             const updatedPerson: PersonType = { ...personIfExists, number: numberField }
             personService.update(updatedPerson)
                 .then(response => {
                     setPersons(replacePerson(persons, response, updatedPerson))
+                    notify('Number changed', true)
+                })
+                .catch(() => {
+                    notify(`The person '${personIfExists.name}' has already been deleted from the server`, false)
                 })
         }
     }
@@ -54,11 +63,29 @@ const App = (): React.JSX.Element => {
         if (!window.confirm(`Delete ${personToDelete.name}?`)) {
             return
         }
-        personService.remove(id).then(response =>
+        personService.remove(id).then(response => {
             setPersons(persons.filter(person =>
                 person.id !== response.id)
             )
-        )
+            notify('Person deleted', true)
+        }
+        ).catch(() => {
+            notify(`The person '${personToDelete.name}' has already been deleted from the server`, false)
+        })
+    }
+
+    const notify = (text: string, positive: boolean) => {
+        setNotificationText(text)
+        if (positive) {
+            setNotificationColor('lightgreen')
+        } else {
+            setNotificationColor('red')
+        }
+        clearTimeout(notificationTimerID)
+        setNotificationTimerID(setTimeout(() => {
+            setNotificationText('')
+            setNotificationColor('white')
+        }, 5000))
     }
 
     useEffect(() => {
@@ -81,6 +108,7 @@ const App = (): React.JSX.Element => {
             <ControlledInputField fieldName='search' fieldOnChange={handleSearchFieldChange} />
             <h2>add a new</h2>
             <AddNewPersonForm handleNameFieldChange={handleNameFieldChange} handleNumberFieldChange={handleNumberFieldChange} handleSubmitButtonClick={handleSubmitButtonClick} />
+            <NotificationText text={notificationText} color={notificationColor} />
             <h2>Numbers</h2>
             <PersonList persons={personsFiltered} handleDeleteButtonClick={deletePerson} />
         </div>
