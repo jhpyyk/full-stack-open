@@ -1,9 +1,9 @@
-interface ControlledInputFieldProps {
+interface InputFieldProps {
     fieldName: string
     fieldOnChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-const ControlledInputField = ({ fieldName, fieldOnChange }: ControlledInputFieldProps): React.JSX.Element => {
+const InputField = ({ fieldName, fieldOnChange }: InputFieldProps): React.JSX.Element => {
     return (
         <>
             {fieldName}: <input onChange={fieldOnChange} />
@@ -11,4 +11,4 @@ const ControlledInputField = ({ fieldName, fieldOnChange }: ControlledInputField
     )
 }
 
-export default ControlledInputField
+export default InputField
