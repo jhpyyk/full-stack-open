@@ -52,7 +52,11 @@ const parseCountries = (data: RawCountryData[]): Country[] => {
             flag: {
                 svg: country.flags.svg,
                 alt: country.flags.alt
-            }
+            },
+            capitalLocation: country.capitalInfo.latlng ? {
+                lat: country.capitalInfo.latlng[0],
+                lng: country.capitalInfo.latlng[1]
+            } : null
         }
     })
     return parsedCountries
