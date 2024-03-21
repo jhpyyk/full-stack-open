@@ -6,11 +6,18 @@ import CountryDisplay from './components/CountryDisplay/CountryDisplay'
 
 const App = () => {
     const [countriesParsed, setCountriesParsed] = useState<Country[]>([])
-    const [countriesFiltered, setCountriesFiltered] = useState<Country[]>([])
+    const [countriesToShow, setCountriesToShow] = useState<Country[]>([])
 
+    const handleChangeCountriesToShow = (countries: Country[]) => {
+        setCountriesToShow(countries)
+    }
 
     const handleSearchFieldChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        setCountriesFiltered(filterCountries(countriesParsed, event.target.value))
+        if (!event.target.value) {
+            setCountriesToShow([])
+        } else {
+            setCountriesToShow(filterCountries(countriesParsed, event.target.value))
+        }
     }
 
     useEffect(() => {
@@ -23,7 +30,7 @@ const App = () => {
         <>
             <h1>Country info</h1>
             <ControlledInputField fieldName={'Search'} fieldOnChange={handleSearchFieldChange} />
-            <CountryDisplay countries={countriesFiltered} />
+            <CountryDisplay countries={countriesToShow} changeCountriesToShow={handleChangeCountriesToShow} />
         </>
     )
 }

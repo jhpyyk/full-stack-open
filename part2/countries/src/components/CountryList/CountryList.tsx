@@ -3,18 +3,21 @@ import './CountryListStyles.css'
 
 type CountryListProps = {
     countries: Country[]
+    changeCountriesToShow: (country: Country[]) => void
 }
 
-const NameEntryList = ({ countries }: CountryListProps) => {
+const CountryList = ({ countries, changeCountriesToShow: changeCountriesToShow }: CountryListProps) => {
     return (
         <>
             <ul className="country-list">
                 {countries.map(country => {
-                    return <li key={country.name}>{country.name}</li>
+                    return (
+                        <li key={country.name}>{country.name}<button onClick={() => changeCountriesToShow([country])}>show</button></li>
+                    )
                 })}
             </ul>
         </>
     )
 }
 
-export default NameEntryList
+export default CountryList
