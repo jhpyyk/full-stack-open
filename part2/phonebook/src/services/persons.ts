@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { PersonNoId, PersonType } from '../types'
 
-const baseUrl = 'http://localhost:3001/api/persons'
+const baseUrl = '/api/persons'
 
 const getAll = (): Promise<PersonType[]> => {
     const request = axios.get(baseUrl)

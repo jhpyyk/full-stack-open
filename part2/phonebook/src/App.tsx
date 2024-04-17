@@ -39,6 +39,7 @@ const App = (): React.JSX.Element => {
                     setPersons(persons.concat(createdPerson))
                     notify('Person added', true)
                 })
+                .catch(error => notify(error.response.data.error, false))
         } else if (window.confirm(`The phonebook already has a person named ${nameField}. Replace the number?`)) {
             console.log('replacing person')
             const updatedPerson: PersonType = { ...personIfExists, number: numberField }
